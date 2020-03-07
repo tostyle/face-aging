@@ -1,0 +1,4 @@
+demo/*
+data/*
+__pycache__
+init_model
