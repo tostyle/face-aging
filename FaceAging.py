@@ -11,11 +11,13 @@ from __future__ import division
 import os
 import time
 from glob import glob
-import tensorflow as tf
+# import tensorflow as tf
 import numpy as np
 from scipy.io import savemat
 from ops import *
-
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
+tf.enable_eager_execution()
 
 class FaceAging(object):
     def __init__(self,
@@ -279,7 +281,8 @@ class FaceAging(object):
             dtype=np.float32
         ) * self.image_value_range[0]
         for i, label in enumerate(sample_files):
-            label = int(str(sample_files[i]).split('/')[-1].split('_')[0])
+            print(sample_files)
+            label = int(str(sample_files[i]).split('\\')[-1].split('_')[0])
             if 0 <= label <= 5:
                 label = 0
             elif 6 <= label <= 10:
@@ -301,7 +304,7 @@ class FaceAging(object):
             else:
                 label = 9
             sample_label_age[i, label] = self.image_value_range[-1]
-            gender = int(str(sample_files[i]).split('/')[-1].split('_')[1])
+            gender = int(str(sample_files[i]).split('\\')[-1].split('_')[1])
             sample_label_gender[i, gender] = self.image_value_range[-1]
 
         # ******************************************* training *******************************************************
@@ -353,7 +356,7 @@ class FaceAging(object):
                     dtype=np.float
                 ) * self.image_value_range[0]
                 for i, label in enumerate(batch_files):
-                    label = int(str(batch_files[i]).split('/')[-1].split('_')[0])
+                    label = int(str(batch_files[i]).split('\\')[-1].split('_')[0])
                     if 0 <= label <= 5:
                         label = 0
                     elif 6 <= label <= 10:
@@ -375,7 +378,7 @@ class FaceAging(object):
                     else:
                         label = 9
                     batch_label_age[i, label] = self.image_value_range[-1]
-                    gender = int(str(batch_files[i]).split('/')[-1].split('_')[1])
+                    gender = int(str(batch_files[i]).split('\\')[-1].split('_')[1])
                     batch_label_gender[i, gender] = self.image_value_range[-1]
 
                 # prior distribution on the prior of z
@@ -551,11 +554,11 @@ class FaceAging(object):
                 )
             if enable_bn:
                 name = 'D_z_bn' + str(i)
-                current = tf.contrib.layers.batch_norm(
+                current = tf.layers.batch_normalization(
                     current,
-                    scale=False,
-                    is_training=is_training,
-                    scope=name,
+                    scale=True,
+                    training=is_training,
+                    name=name,
                     reuse=reuse_variables
                 )
             current = tf.nn.relu(current)
@@ -584,11 +587,11 @@ class FaceAging(object):
                 )
             if enable_bn:
                 name = 'D_img_bn' + str(i)
-                current = tf.contrib.layers.batch_norm(
+                current = tf.layers.batch_normalization(
                     current,
-                    scale=False,
-                    is_training=is_training,
-                    scope=name,
+                    scale=True,
+                    training=is_training,
+                    name=name,
                     reuse=reuse_variables
                 )
             current = tf.nn.relu(current)

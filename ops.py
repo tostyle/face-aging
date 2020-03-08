@@ -1,5 +1,6 @@
 from __future__ import division
-import tensorflow as tf
+# import tensorflow as tf
+import tensorflow.compat.v1 as tf
 import numpy as np
 from scipy.misc import imread, imresize, imsave
 # from imageio import imread, imresize, imsave
